@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Семінари — Теорія і методика проєктування освітнього процесу</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #ffffff;
+    --bg-secondary: #f5f5f3;
+    --bg-tertiary: #eeede8;
+    --text-primary: #1a1a18;
+    --text-secondary: #5a5a56;
+    --text-tertiary: #888780;
+    --border: rgba(0,0,0,0.12);
+    --border-hover: rgba(0,0,0,0.22);
+    --radius-md: 8px;
+    --radius-lg: 12px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1c1c1a;
+      --bg-secondary: #252523;
+      --bg-tertiary: #2e2e2b;
+      --text-primary: #f0efea;
+      --text-secondary: #a8a8a2;
+      --text-tertiary: #6e6e68;
+      --border: rgba(255,255,255,0.1);
+      --border-hover: rgba(255,255,255,0.2);
+    }
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+    min-height: 100vh;
+    line-height: 1.6;
+  }
+
+  .page {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem 4rem;
+  }
+
+  .header {
+    margin-bottom: 2rem;
+  }
+
+  .course-tag {
+    display: inline-block;
+    font-size: 12px;
+    color: var(--text-secondary);
+    background: var(--bg-secondary);
+    border: 0.5px solid var(--border);
+    border-radius: 20px;
+    padding: 3px 12px;
+    margin-bottom: 12px;
+    letter-spacing: 0.02em;
+  }
+
+  h1 {
+    font-size: 26px;
+    font-weight: 500;
+    color: var(--text-primary);
+    line-height: 1.3;
+    margin-bottom: 6px;
+    max-width: 700px;
+  }
+
+  .subtitle {
+    font-size: 14px;
+    color: var(--text-secondary);
+  }
+
+  .filters {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 1.75rem;
+  }
+
+  .filter-btn {
+    padding: 6px 16px;
+    border-radius: 20px;
+    border: 0.5px solid var(--border);
+    background: var(--bg);
+    color: var(--text-secondary);
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: inherit;
+  }
+
+  .filter-btn:hover { background: var(--bg-secondary); border-color: var(--border-hover); }
+
+  .filter-btn.active-all    { background: #EEEDFE; color: #3C3489; border-color: #AFA9EC; }
+  .filter-btn.active-освіта { background: #E6F1FB; color: #0C447C; border-color: #85B7EB; }
+  .filter-btn.active-дослідження { background: #E1F5EE; color: #085041; border-color: #5DCAA5; }
+  .filter-btn.active-психологія  { background: #FBEAF0; color: #72243E; border-color: #ED93B1; }
+  .filter-btn.active-якість      { background: #FAEEDA; color: #633806; border-color: #EF9F27; }
+
+  @media (prefers-color-scheme: dark) {
+    .filter-btn.active-all    { background: #26215C; color: #CECBF6; border-color: #534AB7; }
+    .filter-btn.active-освіта { background: #042C53; color: #B5D4F4; border-color: #378ADD; }
+    .filter-btn.active-дослідження { background: #04342C; color: #9FE1CB; border-color: #1D9E75; }
+    .filter-btn.active-психологія  { background: #4B1528; color: #F4C0D1; border-color: #D4537E; }
+    .filter-btn.active-якість      { background: #412402; color: #FAC775; border-color: #BA7517; }
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 14px;
+  }
+
+  .card {
+    background: var(--bg);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1.1rem 1.25rem;
+    cursor: pointer;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    position: relative;
+  }
+
+  .card:hover { border-color: var(--border-hover); }
+  .card.expanded { border-color: var(--border-hover); box-shadow: 0 2px 16px rgba(0,0,0,0.06); }
+
+  .card-header { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px; }
+
+  .num-badge {
+    width: 30px; height: 30px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 500; flex-shrink: 0;
+  }
+
+  .card-title { font-size: 14px; font-weight: 500; color: var(--text-primary); line-height: 1.4; flex: 1; padding-right: 20px; }
+
+  .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+  .tag { font-size: 11px; padding: 2px 9px; border-radius: 12px; font-weight: 400; }
+
+  .task-preview { font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
+
+  .expand-icon {
+    position: absolute; top: 15px; right: 15px;
+    font-size: 13px; color: var(--text-tertiary);
+    transition: transform 0.2s; user-select: none;
+  }
+  .card.expanded .expand-icon { transform: rotate(180deg); }
+
+  .details { display: none; margin-top: 14px; border-top: 0.5px solid var(--border); padding-top: 14px; }
+  .card.expanded .details { display: block; }
+
+  .section-label {
+    font-size: 11px; font-weight: 500; color: var(--text-tertiary);
+    text-transform: uppercase; letter-spacing: 0.06em;
+    margin-bottom: 6px; margin-top: 14px;
+  }
+  .section-label:first-child { margin-top: 0; }
+
+  .item-list { list-style: none; }
+  .item-list li {
+    font-size: 13px; color: var(--text-secondary);
+    padding: 3px 0 3px 16px; position: relative; line-height: 1.5;
+  }
+  .item-list li::before { content: '—'; position: absolute; left: 0; color: var(--text-tertiary); }
+  .disc-list li::before { content: '?'; font-weight: 500; }
+
+  .task-box {
+    background: var(--bg-secondary); border-radius: var(--radius-md);
+    padding: 10px 14px; font-size: 13px; color: var(--text-primary); line-height: 1.6;
+  }
+
+  /* Per-category colors */
+  .c-purple .num-badge { background: #EEEDFE; color: #3C3489; }
+  .c-purple .tag       { background: #EEEDFE; color: #3C3489; }
+  .c-teal .num-badge   { background: #E1F5EE; color: #085041; }
+  .c-teal .tag         { background: #E1F5EE; color: #085041; }
+  .c-blue .num-badge   { background: #E6F1FB; color: #0C447C; }
+  .c-blue .tag         { background: #E6F1FB; color: #0C447C; }
+  .c-amber .num-badge  { background: #FAEEDA; color: #633806; }
+  .c-amber .tag        { background: #FAEEDA; color: #633806; }
+  .c-green .num-badge  { background: #EAF3DE; color: #27500A; }
+  .c-green .tag        { background: #EAF3DE; color: #27500A; }
+  .c-pink .num-badge   { background: #FBEAF0; color: #72243E; }
+  .c-pink .tag         { background: #FBEAF0; color: #72243E; }
+  .c-coral .num-badge  { background: #FAECE7; color: #712B13; }
+  .c-coral .tag        { background: #FAECE7; color: #712B13; }
+
+  @media (prefers-color-scheme: dark) {
+    .c-purple .num-badge { background: #26215C; color: #CECBF6; }
+    .c-purple .tag       { background: #26215C; color: #CECBF6; }
+    .c-teal .num-badge   { background: #04342C; color: #9FE1CB; }
+    .c-teal .tag         { background: #04342C; color: #9FE1CB; }
+    .c-blue .num-badge   { background: #042C53; color: #B5D4F4; }
+    .c-blue .tag         { background: #042C53; color: #B5D4F4; }
+    .c-amber .num-badge  { background: #412402; color: #FAC775; }
+    .c-amber .tag        { background: #412402; color: #FAC775; }
+    .c-green .num-badge  { background: #173404; color: #C0DD97; }
+    .c-green .tag        { background: #173404; color: #C0DD97; }
+    .c-pink .num-badge   { background: #4B1528; color: #F4C0D1; }
+    .c-pink .tag         { background: #4B1528; color: #F4C0D1; }
+    .c-coral .num-badge  { background: #4A1B0C; color: #F5C4B3; }
+    .c-coral .tag        { background: #4A1B0C; color: #F5C4B3; }
+  }
+
+  footer {
+    margin-top: 3rem;
+    text-align: center;
+    font-size: 12px;
+    color: var(--text-tertiary);
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="header">
+    <div class="course-tag">III освітньо-науковий рівень · PhD</div>
+    <h1>Теорія і методика проєктування освітнього процесу у вищій школі</h1>
+    <p class="subtitle">11 семінарських занять — теоретичні питання, практичні завдання, дискусії</p>
+  </div>
+
+  <div class="filters" id="filters"></div>
+  <div class="grid" id="grid"></div>
+
+  <footer>Семінарські заняття · 2024–2025 навч. рік</footer>
+</div>
+
+<script>
+const seminars = [
+  {
+    num: 1, color: 'c-purple', category: 'освіта', categoryLabel: 'Освітній процес',
+    title: 'Трансформаційні процеси у розвитку сучасної вищої освіти',
+    questions: [
+      'Роль вищої освіти як стратегічного ресурсу соціально-економічного розвитку держави',
+      'Інституційні трансформації університетів в умовах воєнного стану: релокація, мобільність, цифровізація',
+      'Принципи EHEA та їх імплементація в системі вищої освіти України',
+      'Студентоцентрована парадигма навчання як методологічна основа модернізації',
+      'Трансформація ролі викладача в умовах цифровізації та інтернаціоналізації'
+    ],
+    task: 'Проаналізувати освітню програму українського університету: виявити прояви студентоцентрованого підходу, інтеграцію цифрових технологій та відповідність принципам EHEA',
+    discussion: [
+      'Чи може дистанційне навчання забезпечити якість освіти на рівні традиційного?',
+      'Чи зберігається роль викладача в умовах цифрових платформ?'
+    ]
+  },
+  {
+    num: 2, color: 'c-teal', category: 'дослідження', categoryLabel: 'Наука',
+    title: 'Методологічні засади сучасних педагогічних досліджень',
+    questions: [
+      'Еволюція педагогічної науки: від класичної до постнекласичної наукової раціональності',
+      'Методологічний потенціал системного, синергетичного та аксіологічного підходів',
+      'Конструктивістська та соціально-конструкціоністська парадигми у дослідженні освітньої діяльності',
+      'Evidence-based education як сучасна дослідницька стратегія',
+      'Інтеграція кількісних і якісних методів дослідження (mixed methods)'
+    ],
+    task: 'Розробити методологічну схему власного дисертаційного дослідження: визначити методологічні підходи, методи збору даних та науково-категорійний апарат',
+    discussion: [
+      'Чи є наукометричні бази об\'єктивним показником якості науки?'
+    ]
+  },
+  {
+    num: 3, color: 'c-blue', category: 'освіта', categoryLabel: 'Освітній процес',
+    title: 'Організаційно-методичні засади проведення навчальних занять у вищій школі',
+    questions: [
+      'Дидактичні функції лекції в сучасному освітньому процесі університету',
+      'Семінарське заняття як форма розвитку аналітичного та критичного мислення',
+      'Методичні принципи організації практичних та лабораторних занять',
+      'Інтерактивні та проблемно-орієнтовані методи навчання',
+      'Навчально-методичне забезпечення дисципліни як компонент якості освітнього процесу'
+    ],
+    task: 'Розробити план інтерактивного семінарського заняття для магістерського курсу з педагогіки (або іншого предмету)',
+    discussion: [
+      'Чи є традиційна лекція ефективною формою навчання?',
+      'Чи повинні лекції бути інтерактивними?'
+    ]
+  },
+  {
+    num: 4, color: 'c-amber', category: 'освіта', categoryLabel: 'Освітній процес',
+    title: 'Організація самостійної та індивідуальної роботи здобувачів вищої освіти',
+    questions: [
+      'Самостійна робота студентів як ключовий елемент студентоцентрованого навчання',
+      'Організаційно-методичні моделі індивідуалізації освітнього процесу',
+      'Тьюторство та академічне наставництво як механізми персоналізації освітніх траєкторій',
+      'Роль дослідницьких завдань у формуванні наукової культури студентів'
+    ],
+    task: 'Розробити індивідуальне дослідницьке завдання для студентів: есе, міні-дослідження або аналітичний огляд',
+    discussion: [
+      'Чому студенти уникають самостійної роботи?',
+      'Чи повинна самостійна робота оцінюватися?'
+    ]
+  },
+  {
+    num: 5, color: 'c-green', category: 'дослідження', categoryLabel: 'Наука',
+    title: 'Науково-дослідна діяльність студентів у системі університетської освіти',
+    questions: [
+      'Концептуальні засади організації студентської наукової діяльності у ЗВО',
+      'Курсові та кваліфікаційні роботи як форма формування дослідницької компетентності',
+      'Наукові гуртки, проблемні групи та студентські дослідницькі проєкти',
+      'Інтеграція наукової діяльності студентів у міжнародний академічний простір'
+    ],
+    task: 'Розробити концепцію студентського наукового гуртка у галузі освітніх наук.\n\nАналітичне есе (1500–2000 слів): «Академічна доброчесність як основа культури університету»',
+    discussion: []
+  },
+  {
+    num: 6, color: 'c-pink', category: 'якість', categoryLabel: 'Якість',
+    title: 'Педагогічний контроль та оцінювання результатів навчання',
+    questions: [
+      'Теоретичні засади педагогічної діагностики у системі вищої освіти',
+      'Функції та принципи оцінювання результатів навчання у компетентнісній моделі',
+      'Формувальне та підсумкове оцінювання як інструменти управління освітнім процесом',
+      'Тестові технології та рейтингові системи оцінювання у вищій школі'
+    ],
+    task: 'Розробити критерії оцінювання результатів навчання для однієї навчальної дисципліни',
+    discussion: [
+      'Чи здатна сучасна система оцінювання адекватно відображати рівень сформованості компетентностей?',
+      'Наскільки ефективним є використання тестових технологій для оцінювання складних компетентностей?'
+    ]
+  },
+  {
+    num: 7, color: 'c-coral', category: 'освіта', categoryLabel: 'Освітній процес',
+    title: 'Національно-патріотичне виховання у системі університетської освіти',
+    questions: [
+      'Нормативно-правові засади виховної діяльності закладів вищої освіти України',
+      'Формування громадянської компетентності та національної ідентичності студентської молоді',
+      'Академічна доброчесність як ціннісний компонент університетської культури',
+      'Баланс між національною ідентичністю та європейськими демократичними цінностями'
+    ],
+    task: 'Розробити модель виховного проєкту університету, спрямованого на розвиток громадянської компетентності студентів',
+    discussion: [
+      'Чи існує ризик ідеологізації освітнього процесу при надмірній інституціоналізації патріотичного виховання?',
+      'Яку роль відіграють гуманітарні дисципліни у формуванні національної ідентичності?',
+      'Як університети можуть сприяти інтеграції ветеранів та внутрішньо переміщених осіб?'
+    ]
+  },
+  {
+    num: 8, color: 'c-purple', category: 'психологія', categoryLabel: 'Психологія',
+    title: 'Психологічні теорії розвитку дорослої особистості',
+    questions: [
+      'Теоретичні моделі когнітивного розвитку особистості у дорослому віці',
+      'Конструктивістська парадигма навчання у вищій школі',
+      'Розвиток критичного та наукового мислення у студентському середовищі',
+      'Самоефективність як психологічний чинник академічної успішності'
+    ],
+    task: 'Провести міні-дослідження академічної мотивації студентів',
+    discussion: [
+      'Наскільки конструктивістська парадигма ефективна для підготовки майбутніх науковців?',
+      'Чи може цифрове освітнє середовище розвивати або обмежувати критичне мислення?',
+      'Чи повинна вища освіта приділяти більше уваги розвитку soft skills?'
+    ]
+  },
+  {
+    num: 9, color: 'c-teal', category: 'психологія', categoryLabel: 'Психологія',
+    title: 'Психологічна підтримка та резильєнтність учасників освітнього процесу',
+    questions: [
+      'Психологічні наслідки війни для студентської молоді',
+      'Посттравматичний стрес та академічне вигорання',
+      'Концепція резильєнтності у сучасній психології освіти',
+      'Психолого-педагогічні механізми підтримки студентів'
+    ],
+    task: 'Розробити програму психологічної підтримки студентів університету',
+    discussion: [
+      'Яким чином освітній процес може сприяти розвитку резильєнтності?',
+      'Чи існує ризик зниження академічних стандартів при надмірній психологізації освіти?',
+      'Як поєднати академічну вимогливість із гуманістичною педагогікою підтримки?'
+    ]
+  },
+  {
+    num: 10, color: 'c-blue', category: 'психологія', categoryLabel: 'Психологія',
+    title: 'Інклюзивність та академічна комунікація у вищій освіті',
+    questions: [
+      'Інклюзивна політика у системі вищої освіти',
+      'Психолого-педагогічний супровід студентів з особливими освітніми потребами',
+      'Академічна комунікація як компонент університетської культури',
+      'Запобігання дискримінації та булінгу у студентському середовищі'
+    ],
+    task: 'Розробити інклюзивну модель навчального заняття',
+    discussion: [
+      'Чи повинні університети впроваджувати спеціальні програми протидії дискримінації та булінгу?',
+      'Які механізми можуть забезпечити формування інклюзивної культури академічної спільноти?',
+      'Чи може цифрове освітнє середовище посилювати соціальну нерівність серед студентів?'
+    ]
+  },
+  {
+    num: 11, color: 'c-amber', category: 'якість', categoryLabel: 'Якість',
+    title: 'Система забезпечення якості вищої освіти',
+    questions: [
+      'Концептуальні засади забезпечення якості освіти відповідно до стандартів ESG',
+      'Внутрішні системи забезпечення якості у закладах вищої освіти',
+      'Освітня аналітика як інструмент управління якістю освіти',
+      'Євроінтеграційні процеси у розвитку вищої освіти України'
+    ],
+    task: 'Провести аналіз освітньої програми на відповідність стандартам якості ESG',
+    discussion: [
+      'Наскільки ефективною є сучасна модель акредитації освітніх програм?',
+      'Чи може система забезпечення якості функціонувати без культури академічної відповідальності?',
+      'Чи здатна освітня аналітика (data-driven management) підвищити ефективність управління університетом?'
+    ]
+  }
+];
+
+const filterDefs = [
+  { key: 'all',          label: 'Всі семінари' },
+  { key: 'освіта',       label: 'Освітній процес' },
+  { key: 'дослідження',  label: 'Наука і дослідження' },
+  { key: 'психологія',   label: 'Психологія' },
+  { key: 'якість',       label: 'Якість освіти' }
+];
+
+let activeFilter = 'all';
+
+function buildFilters() {
+  const el = document.getElementById('filters');
+  filterDefs.forEach(f => {
+    const btn = document.createElement('button');
+    btn.className = 'filter-btn' + (f.key === 'all' ? ' active-all' : '');
+    btn.textContent = f.label;
+    btn.dataset.key = f.key;
+    btn.onclick = () => {
+      activeFilter = f.key;
+      document.querySelectorAll('.filter-btn').forEach(b => {
+        b.className = 'filter-btn';
+      });
+      btn.className = 'filter-btn active-' + f.key;
+      renderGrid();
+    };
+    el.appendChild(btn);
+  });
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function renderGrid() {
+  const grid = document.getElementById('grid');
+  const list = activeFilter === 'all' ? seminars : seminars.filter(s => s.category === activeFilter);
+
+  grid.innerHTML = list.map((s, i) => {
+    const preview = s.task.length > 90 ? s.task.substring(0, 90) + '…' : s.task;
+    const qs = s.questions.map(q => `<li>${escHtml(q)}</li>`).join('');
+    const disc = s.discussion.length
+      ? `<div class="section-label">Питання для дискусії</div>
+         <ul class="item-list disc-list">${s.discussion.map(d => `<li>${escHtml(d)}</li>`).join('')}</ul>`
+      : '';
+    return `
+      <div class="card ${s.color}" id="card-${i}" onclick="toggle(${i})">
+        <span class="expand-icon">↓</span>
+        <div class="card-header">
+          <div class="num-badge">${s.num}</div>
+          <div class="card-title">${escHtml(s.title)}</div>
+        </div>
+        <div class="tags"><span class="tag">${escHtml(s.categoryLabel)}</span></div>
+        <div class="task-preview">${escHtml(preview)}</div>
+        <div class="details">
+          <div class="section-label">Теоретичні питання</div>
+          <ul class="item-list">${qs}</ul>
+          <div class="section-label" style="margin-top:14px">Практичне завдання</div>
+          <div class="task-box">${escHtml(s.task).replace(/\n/g,'<br>')}</div>
+          ${disc}
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function toggle(i) {
+  document.getElementById('card-' + i).classList.toggle('expanded');
+}
+
+buildFilters();
+renderGrid();
+</script>
+</body>
+</html>
